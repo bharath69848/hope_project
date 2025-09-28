@@ -1,0 +1,168 @@
+# 📌 DSA Tracker – Project PRD
+
+## 1. 🎯 Objective
+
+A minimal **student performance tracker** for Dream & Elite batches. The app will:
+
+* Track problem-solving activity across 4 platforms (LeetCode, Codeforces, AtCoder, GFG).
+* Store daily stats in **Supabase**.
+* Calculate an **Elo-like score** based on consistency and difficulty.
+* Display a **leaderboard** for Admins.
+
+This is a **prototype** → keep it very simple (HTML, CSS, vanilla JS + Node.js backend).
+
+---
+
+## 2. 👥 Users
+
+* **Admin (Mentor)**
+
+  * Hardcoded login (no Supabase Auth in v1).
+  * Can view dashboards for Dream & Elite batches.
+* **Students**
+
+  * Data is stored in Supabase (name, batch, platform handles).
+  * No login for students (just tracked).
+
+---
+
+## 3. 📊 Elo Formula
+
+### Base Points (per problem)
+
+* LeetCode → **1 point**
+* GFG → **1 point**
+* Codeforces → **1.5 points**
+* AtCoder → **1.5 points**
+
+### Consistency Bonus
+
+* Track last **7 days streak**.
+* If ≥ 1 problem/day → `+2 * streak_length` (max = 14).
+
+### Formula
+
+```
+Elo = (LC * 1) + (GFG * 1) + (CF * 1.5) + (AC * 1.5) + ConsistencyBonus
+```
+
+### Example
+
+```
+LC = 10 → 10
+GFG = 5 → 5
+CF = 3 → 4.5
+AC = 2 → 3
+Streak = 5 days → +10
+Elo = 32.5 → 33
+```
+
+---
+links for to get api response
+leetcode : https://leetcode-api-faisalshohag.vercel.app/
+gfg : https://geeks-for-geeks-api.vercel.app/
+codeforces : https://codeforces.com/api/user.status?handle= 
+atcoder : https://www.npmjs.com/package/@qatadaazzeh/atcoder-api
+hackerank : to be searched 
+
+
+supabase envs 
+url : https://ztsqkwqerfznhkdjucfj.supabase.co
+api key anon public key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0c3Frd3FlcmZ6bmhrZGp1Y2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMzkxOTUsImV4cCI6MjA3NDYxNTE5NX0.x_3CdAaLYBsYUArwxEBa3PVLgpnQN0eZiAX-thDiLzg
+
+
+## 4. 🛠️ Features (Prototype v1)
+
+### 🔑 Admin Login
+
+* Static HTML login page.
+* Hardcoded credentials in JS (e.g., admin / pass123).
+
+### 📋 Dashboard
+
+* Two tabs → Dream / Elite batches.
+* Table of students:
+
+  * Name
+  * LC / CF / AC / GFG counts
+  * Elo Score
+* Leaderboard sorted by Elo.
+
+### ⚡ Automation (Backend Job)
+
+* Node.js script runs daily (cron job).
+* Fetches problem counts from APIs.
+* Saves counts + Elo into Supabase `student_stats`.
+
+---
+
+## 5. 🪜 Roadmap (Baby Steps)
+
+### Phase 0 – Manual Dashboard
+
+* [ ] Setup Supabase tables.
+* [ ] Create static `login.html` and `dashboard.html`.
+* [ ] Hardcode Admin login.
+* [ ] Fetch `students` + `student_stats` from Supabase.
+* [ ] Display leaderboard (manual Elo entry).
+
+### Phase 1 – Automated Stats
+
+* [ ] Write Node.js script to fetch Codeforces + LeetCode counts.
+* [ ] Save into Supabase `student_stats`.
+* [ ] Add Elo calculation in script.
+
+### Phase 2 – Extend Platforms
+
+* [ ] Add AtCoder scraping.
+* [ ] Add GFG scraping.
+* [ ] Add 7-day streak consistency check.
+
+### Phase 3 – UI Polish
+
+* [ ] Add sorting, filters (batch switcher).
+* [ ] Highlight streak achievers with badge.
+* [ ] Show Elo history graph (per student).
+
+---
+
+## 6. 🚀 Deliverables
+
+* **Frontend**: HTML + CSS + JS → `login.html`, `dashboard.html`.
+* **Backend**: Node.js script (runs daily) → fetch stats, save to Supabase.
+* **Database**: Supabase tables `students`, `student_stats`.
+* **Leaderboard**: Elo-sorted table for Dream & Elite batches.
+
+---
+
+# 📂 Supabase Schema PRD
+
+## 1. Tables
+
+### `students`
+
+| Column              | Type        | Notes                     |
+| ------------------- | ----------- | ------------------------- |
+| id                  | uuid        | Primary key               |
+| name                | text        | Student name              |
+| batch               | text        | Either `Dream` or `Elite` |
+| leetcode_username   | text        | Username on LeetCode      |
+| codeforces_username | text        | Username on Codeforces    |
+| atcoder_username    | text        | Username on AtCoder       |
+| gfg_username        | text        | Username on GFG           |
+| created_at          | timestamptz | Default = now()           |
+
+### `student_stats`
+
+| Column           | Type | Notes                       |
+| ---------------- | ---- | --------------------------- |
+| id               | uuid | Primary key                 |
+| student_id       | uuid | FK → students(id)           |
+| date             | date | Default = current_date      |
+| leetcode_count   | int  | Problems solved that day    |
+| codeforces_count | int  | Problems solved that day    |
+| atcoder_count    | int  | Problems solved that day    |
+| gfg_count        | int  | Problems solved that day    |
+| elo_score        | int  | Calculated Elo for that day |
+
+Indexes: `(student_id, date)` for fast lookups.

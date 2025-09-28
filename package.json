@@ -1,0 +1,24 @@
+{
+  "name": "dsa-tracker",
+  "version": "1.0.0",
+  "description": "DSA Tracker - Student Performance Tracker for Dream & Elite batches",
+  "main": "update-stats.js",
+  "scripts": {
+    "start": "node update-stats.js",
+    "dev": "node update-stats.js",
+    "fast": "node update-stats-fast.js",
+    "auto": "node auto-updater.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["dsa", "tracker", "leetcode", "student", "performance"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
